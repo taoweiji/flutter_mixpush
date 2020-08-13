@@ -1,0 +1,51 @@
+
+group 'com.mixpush.flutter_mixpush'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.3.72'
+    repositories {
+        google()
+        jcenter()
+        maven { url 'http://developer.huawei.com/repo/' }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'http://developer.huawei.com/repo/' }
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 28
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    defaultConfig {
+        minSdkVersion 16
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.mixpush:mixpush-core:2.0.3"// 核心包
+    implementation "com.mixpush:mixpush-mi:2.0.3" // 小米推送
+    implementation "com.mixpush:mixpush-meizu:2.0.3" // 魅族推送
+    implementation "com.mixpush:mixpush-huawei:2.0.3" // 华为推送
+    implementation "com.mixpush:mixpush-oppo:2.0.3" // OPPO推送
+    implementation "com.mixpush:mixpush-vivo:2.0.3" // VIVO推送
+}

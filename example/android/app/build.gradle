@@ -1,0 +1,78 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply plugin: 'com.huawei.agconnect'
+
+android {
+    compileSdkVersion 28
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.mixpush.flutter_mixpush_example"
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        manifestPlaceholders["VIVO_APP_ID"] = "<VIVO_APP_ID>"
+        manifestPlaceholders["VIVO_APP_KEY"] = "<VIVO_APP_KEY>"
+        manifestPlaceholders["MI_APP_ID"] = "<MI_APP_ID>"
+        manifestPlaceholders["MI_APP_KEY"] = "<MI_APP_KEY>"
+        manifestPlaceholders["OPPO_APP_KEY"] = "<OPPO_APP_KEY>"
+        manifestPlaceholders["OPPO_APP_SECRET"] = "<OPPO_APP_SECRET>"
+        manifestPlaceholders["MEIZU_APP_ID"] = "<MEIZU_APP_ID>"
+        manifestPlaceholders["MEIZU_APP_KEY"] = "<MEIZU_APP_KEY>"
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.mixpush:mixpush-mi:2.0.3" // 小米推送
+    implementation "com.mixpush:mixpush-meizu:2.0.3" // 魅族推送
+    implementation "com.mixpush:mixpush-huawei:2.0.3" // 华为推送
+    implementation "com.mixpush:mixpush-oppo:2.0.3" // OPPO推送
+    implementation "com.mixpush:mixpush-vivo:2.0.3" // VIVO推送
+}

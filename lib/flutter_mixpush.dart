@@ -1,0 +1,83 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+
+class FlutterMixPush {
+  static const MethodChannel _channel =
+  const MethodChannel('com.mixpush/flutter_mixpush');
+  static const EventChannel _eventChannel =
+  const EventChannel('com.mixpush/flutter_mixpush_event');
+
+  static Future<String> get platformVersion async {
+    final String version = await _channel.invokeMethod('getPlatformVersion');
+    return version;
+  }
+
+  static Future<Map> get getRegisterId async {
+    final Map version = await _channel.invokeMethod('getRegisterId');
+    return version;
+  }
+
+  static Future<Map> _init() async {
+    final Map result = await _channel.invokeMethod('init');
+    if (result.containsKey("message")) {
+      _handleClick(result["message"]);
+    }
+    return result;
+  }
+
+  static _handleClick(Map message) {
+    _onNotificationMessageClicked(MixPushMessage(
+      title: message["title"],
+      description: message["description"],
+      platform: message["platform"],
+      payload: message["payload"],
+      passThrough: message["passThrough"],
+    ));
+  }
+
+  static ValueChanged<MixPushMessage> _onNotificationMessageClicked;
+  static ValueChanged<dynamic> _onError;
+
+  static init({
+    @required ValueChanged<MixPushMessage> onNotificationMessageClicked,
+    ValueChanged<dynamic> onError,
+  }) {
+    _onError = onError;
+    _onNotificationMessageClicked = onNotificationMessageClicked;
+    _init();
+    _eventChannel.receiveBroadcastStream().listen((message) {
+      _handleClick(message);
+    }, onError: (dynamic errorDetails) {
+      if (_onError != null) {
+        _onError(errorDetails);
+      }
+      print(
+          "MixPush error:details:$errorDetails");
+    }, onDone: () {});
+  }
+}
+
+class MixPushMessage {
+  /// 通知栏标题,透传该字段为空
+  String title;
+
+  /// 通知栏副标题,透传该字段为空
+  String description;
+
+  /// 推送所属平台,比如mi/huawei
+  String platform;
+
+  /// 推送附属的内容信息
+  String payload;
+
+  /// 是否是透传推送
+  bool passThrough;
+
+  MixPushMessage({this.title,
+    this.description,
+    this.platform,
+    this.payload,
+    this.passThrough});
+}
