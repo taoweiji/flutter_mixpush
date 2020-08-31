@@ -14,9 +14,10 @@ class FlutterMixPush {
     return version;
   }
 
-  static Future<Map> get getRegisterId async {
-    final Map version = await _channel.invokeMethod('getRegisterId');
-    return version;
+  static Future<MixPushPlatform> get getRegisterId async {
+    final Map info = await _channel.invokeMethod('getRegisterId');
+    var platform = MixPushPlatform(info["platformName"], info["regId"]);
+    return platform;
   }
 
   static Future<Map> _init() async {
@@ -40,9 +41,11 @@ class FlutterMixPush {
   static ValueChanged<MixPushMessage> _onNotificationMessageClicked;
   static ValueChanged<dynamic> _onError;
 
-  static init({
+  static register({
     @required ValueChanged<MixPushMessage> onNotificationMessageClicked,
+    @required ValueChanged<MixPushPlatform> onGetRegisterId,
     ValueChanged<dynamic> onError,
+
   }) {
     _onError = onError;
     _onNotificationMessageClicked = onNotificationMessageClicked;
@@ -53,9 +56,30 @@ class FlutterMixPush {
       if (_onError != null) {
         _onError(errorDetails);
       }
-      print(
-          "MixPush error:details:$errorDetails");
+      print("MixPush error:details:$errorDetails");
     }, onDone: () {});
+    if (onGetRegisterId != null) {
+      getRegisterId.then((platform) {
+        onGetRegisterId(platform);
+      }).catchError((error) {
+        print("MixPush onGetRegisterId error: $error");
+        if (onError != null) {
+          onError("MixPush onGetRegisterId error: $error");
+        }
+      });
+    }
+  }
+}
+
+class MixPushPlatform {
+  String platformName;
+  String regId;
+
+  MixPushPlatform(this.platformName, this.regId);
+
+  @override
+  String toString() {
+    return 'MixPushPlatform{platformName: $platformName, regId: $regId}';
   }
 }
 
@@ -80,4 +104,10 @@ class MixPushMessage {
     this.platform,
     this.payload,
     this.passThrough});
+
+  @override
+  String toString() {
+    return 'MixPushMessage{title: $title, description: $description, platform: $platform, payload: $payload, passThrough: $passThrough}';
+  }
+
 }
