@@ -28,6 +28,7 @@
         result(UIDevice.currentDevice.systemVersion);
     } else if ([call.method isEqualToString:@"init"]) {
         NSDictionary *dict = [self parseMessage:_waitingMessage];
+        NSLog(@"push init data: %@", dict);
         result(dict);
     } else if ([call.method isEqualToString:@"getRegisterId"]) {
         NSString *regId = [MiPushSDK getRegId];
@@ -43,17 +44,21 @@
 - (void)clickNotification:(NSDictionary *)message {
     if (_eventSink) {
         NSDictionary *dict = [self parseMessage:message];
+        NSLog(@"push eventSink data: %@", dict);
         _eventSink(dict);
         _waitingMessage = nil;
     }
 }
 
 - (NSDictionary *)parseMessage:(NSDictionary *)message {
+    if (!message) {
+        return @{};
+    }
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     [dict setValue:SAFE_STRING_VALUE(message[@"aps"][@"alert"][@"title"]) forKey:@"title"];
     [dict setValue:SAFE_STRING_VALUE(message[@"aps"][@"alert"][@"subtitle"]) forKey:@"description"];
     [dict setValue:@"mi_apns" forKey:@"platform"];
-    [dict setValue:SAFE_STRING_VALUE(message[@"payload"]) forKey:@"payload"];
+    [dict setValue:[NSString stringWithFormat:@"%@", message[@"payload"]] forKey:@"payload"];
     [dict setValue:@(false) forKey:@"isPassThrough"];
     return dict;
 }
@@ -132,7 +137,7 @@
 
 - (void)miPushReceiveNotification:(NSDictionary*)data{
     // 测试了，没有长链接，都是走APNS -> wmh
-    NSLog(@"mipush XMPP notify: %@", data);
+//    NSLog(@"mipush XMPP notify: %@", data);
 }
 
 - (NSString*)getOperateType:(NSString*)selector{
