@@ -15,9 +15,13 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '8.0'
+  s.platform = :ios, '10.0'
+  s.ios.vendored_libraries = 'lib/libMiPushSDK.a'
+  s.frameworks = 'SystemConfiguration', 'UserNotifications', 'MobileCoreServices', 'CoreTelephony', 'CFNetwork'
+  s.libraries = 'xml2', 'resolv', 'z'
+  s.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '-lObjC' }
+  s.static_framework = true
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
-  s.swift_version = '5.0'
 end
