@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 class FlutterMixPush {
   static const MethodChannel _channel =
-  const MethodChannel('com.mixpush/flutter_mixpush');
+      const MethodChannel('com.mixpush/flutter_mixpush');
   static const EventChannel _eventChannel =
-  const EventChannel('com.mixpush/flutter_mixpush_event');
+      const EventChannel('com.mixpush/flutter_mixpush_event');
 
   static Future<String> get platformVersion async {
     final String version = await _channel.invokeMethod('getPlatformVersion');
@@ -15,9 +16,17 @@ class FlutterMixPush {
   }
 
   static Future<MixPushPlatform> get getRegisterId async {
-    final Map info = await _channel.invokeMethod('getRegisterId');
-    var platform = MixPushPlatform(info["platformName"], info["regId"]);
-    return platform;
+    int checkCount = Platform.isIOS ? 10 : 1;
+    while (checkCount > 0) {
+      checkCount--;
+      try {
+        final Map info = await _channel.invokeMethod('getRegisterId');
+        var platform = MixPushPlatform(info["platformName"], info["regId"]);
+        return platform;
+      } catch (e) {}
+      await Future.delayed(Duration(seconds: 5));
+    }
+    throw Exception("获取超时");
   }
 
   static Future<Map> _init() async {
@@ -45,7 +54,6 @@ class FlutterMixPush {
     @required ValueChanged<MixPushMessage> onNotificationMessageClicked,
     @required ValueChanged<MixPushPlatform> onGetRegisterId,
     ValueChanged<dynamic> onError,
-
   }) {
     _onError = onError;
     _onNotificationMessageClicked = onNotificationMessageClicked;
@@ -99,15 +107,15 @@ class MixPushMessage {
   /// 是否是透传推送
   bool passThrough;
 
-  MixPushMessage({this.title,
-    this.description,
-    this.platform,
-    this.payload,
-    this.passThrough});
+  MixPushMessage(
+      {this.title,
+      this.description,
+      this.platform,
+      this.payload,
+      this.passThrough});
 
   @override
   String toString() {
     return 'MixPushMessage{title: $title, description: $description, platform: $platform, payload: $payload, passThrough: $passThrough}';
   }
-
 }
