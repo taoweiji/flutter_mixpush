@@ -111,7 +111,11 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
     NSDictionary * userInfo = response.notification.request.content.userInfo;
     if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
-        [self clickNotification:userInfo];
+        if (_eventSink) {
+            [self clickNotification:userInfo];
+        } else {
+            _waitingMessage = userInfo;
+        }
     }
     completionHandler();
 }
