@@ -35,6 +35,8 @@ class FlutterMixPush {
     final Map result = await _channel.invokeMethod('init');
     if (result.containsKey("message")) {
       _handleClick(result["message"]);
+    } else {
+      _handleClick(result);
     }
     return result;
   }
