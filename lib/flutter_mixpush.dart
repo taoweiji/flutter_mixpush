@@ -24,7 +24,9 @@ class FlutterMixPush {
         var platform = MixPushPlatform(info["platformName"], info["regId"]);
         return platform;
       } catch (e) {}
-      await Future.delayed(Duration(seconds: 5));
+      if(checkCount > 0){
+        await Future.delayed(Duration(seconds: 5));
+      }
     }
     throw Exception("获取超时");
   }
