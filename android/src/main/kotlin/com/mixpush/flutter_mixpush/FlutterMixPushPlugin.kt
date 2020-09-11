@@ -58,7 +58,7 @@ public class FlutterMixPushPlugin : FlutterPlugin, MethodCallHandler, EventChann
         fun clickNotification(message: MixPushMessage) {
             waitingMessage = message
             if (eventSink != null) {
-                val result = HashMap<Any, Any>()
+                val result = HashMap<Any, Any?>()
                 result["title"] = waitingMessage!!.title
                 result["description"] = waitingMessage!!.description
                 result["platform"] = waitingMessage!!.platform
@@ -85,9 +85,9 @@ public class FlutterMixPushPlugin : FlutterPlugin, MethodCallHandler, EventChann
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
             }
             "init" -> {
-                val map = HashMap<Any, Any>()
+                val map = HashMap<Any, Any?>()
                 if (waitingMessage != null) {
-                    val message = HashMap<Any, Any>()
+                    val message = HashMap<Any, Any?>()
                     message["title"] = waitingMessage!!.title
                     message["description"] = waitingMessage!!.description
                     message["platform"] = waitingMessage!!.platform
@@ -107,7 +107,7 @@ public class FlutterMixPushPlugin : FlutterPlugin, MethodCallHandler, EventChann
                     override fun callback(platform: MixPushPlatform?) {
                         Handler(Looper.getMainLooper()).post {
                             if (platform != null) {
-                                val map = HashMap<Any, Any>()
+                                val map = HashMap<Any, Any?>()
                                 map["platformName"] = platform.platformName
                                 map["regId"] = platform.regId
                                 result.success(map)
