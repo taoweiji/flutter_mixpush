@@ -64,11 +64,13 @@ public class FlutterMixPushPlugin : FlutterPlugin, MethodCallHandler, EventChann
                 result["platform"] = waitingMessage!!.platform
                 result["payload"] = waitingMessage!!.payload
                 result["isPassThrough"] = waitingMessage!!.isPassThrough
-                try {
-                    eventSink!!.success(result)
-                    waitingMessage = null
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                Handler(Looper.getMainLooper()).post {
+                    try {
+                        eventSink!!.success(result)
+                        waitingMessage = null
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
